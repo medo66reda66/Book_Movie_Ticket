@@ -1,0 +1,12 @@
+﻿@using Book_Movie_Tictet.Models
+@model Category
+<div>
+    <form method="post">
+        <h2>Edit Category</h2>
+        <input type="hidden" name="id" value="@Model.Id" />
+        <label for="Name">Category Name</label>
+        <input type="text" name="Name" value="@Model.Name" class="form-control" />
+        <br />
+        <input type="submit" value="Update" class="btn btn-sm btn-success" />
+    </form>
+</div>
