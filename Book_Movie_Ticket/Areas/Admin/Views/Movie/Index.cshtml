@@ -1,0 +1,57 @@
+﻿@using Book_Movie_Ticket.MovieVM
+@model MovieVM
+<div>
+    <h2>Movies</h2>
+    <a href="/Admin/Movie/Create" class="btn btn-sm btn-success">Create<br></a>
+    <hr>
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>MainImg</th>
+                <th>Cinema name</th>
+                <th>Category name</th>
+                <th>list Actor</th>
+                <th>Datetime</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Movies)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Name</td>
+                    <td>@item.Description</td>
+                    <td>@item.Price.ToString("c")</td>
+                    <td>@item.MainImg</td>
+                    <td>@item.Cinema.Name</td>
+                    <td>@item.Category.Name</td>
+                    <td>
+                        @foreach (var actor in item.Actors)
+                        {
+                            <h3>@actor.FullName</h3><br />
+                        }
+                    </td>
+                    <td>@item.Datetime</td>
+                    @if (item.Status)
+                    {
+                        <td><span class="badge text-bg-success">Active</span></td>
+                    }
+                    else
+                    {
+                        <td><span class="badge text-bg-danger">Inactive</span></td>
+                    }
+                    <td>
+                        <a href="/Admin/Movie/Edit/@item.Id" type="button" class="btn btn-warning">Edit</a>
+                        <a href="/Admin/Movie/Delete/@item.Id" type="button" class="btn btn-danger btn-delete">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

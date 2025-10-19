@@ -16,6 +16,8 @@ namespace Book_Movie_Tickets.Models
         public Cinema? Cinema { get; set; }
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
-        public List<ActorsMovie> ActorsMovies { get; set; }
+        public List<Actors>? Actors { get; set; }
+        public List<ActorsMovie>? ActorsMovies { get; set; }
+        public List<MovieSupimg>? Supimg { get; set; }
     }
 }

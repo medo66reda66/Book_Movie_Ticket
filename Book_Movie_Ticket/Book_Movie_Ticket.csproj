@@ -16,7 +16,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\Actorimg\" />
+    <Folder Include="wwwroot\Movieimg\" />
+    <Folder Include="wwwroot\Moviesupimg\" />
   </ItemGroup>
+	
+	
+	
 
 </Project>

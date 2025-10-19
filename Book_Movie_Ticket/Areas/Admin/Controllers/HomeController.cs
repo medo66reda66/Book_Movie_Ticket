@@ -2,8 +2,9 @@ using System.Diagnostics;
 using Book_Movie_Ticket.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Book_Movie_Ticket.Areas.Admin.Controllers
+namespace Book_Movie_Ticket.Areas.Admin.controllers
 {
+    [Area("Admin")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

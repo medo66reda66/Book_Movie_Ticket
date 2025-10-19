@@ -1,0 +1,32 @@
+﻿
+@using Book_Movie_Tictet.Models
+@model IEnumerable<Actors>
+<div>
+    <h2>Actors</h2>
+    <a href="/Admin/Actors/Create" class="btn btn-sm btn-success">Create<br></a>
+    <hr>
+    <table  class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>id</th>
+                <th>Fullname</th>
+                <th>Profile Picture</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.FullName</td>
+                    <td>@item.Img</td>
+                    <td>
+                        <a href="/Admin/Actors/Edit/@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="/Admin/Actors/Delete/@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,15 +1,16 @@
-﻿@using Book_Movie_Tictet.Models
-@model IEnumerable<Category>
+﻿@using Book_Movie_Tickets.Models
+@model IEnumerable<Cinema>
 
 <div>
-    <h2>Category List</h2>
-    <a href="/Admin/Category/Create" class="btn btn-sm btn-success">Create<br></a>
+    <h2>Cinema List</h2>
+    <a href="/Admin/Cinema/Create" class="btn btn-sm btn-success">Create<br></a>
     <hr >
     <table class="table table-bordered">
         <thead class="table-dark">
             <tr>
                 <th scope="col">Id</th>
                 <th scope="col">Name</th>
+                <th scope="col">Img</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -19,12 +20,14 @@
                     <tr>
                         <td>@item.Id</td>
                         <td>@item.Name</td>
+                        <td>@item.Img</td>
                         <td>
-                        <a href="/Admin/Category/Edit/@item.Id" class="btn btn-sm btn-primary">Edit</a>
-                        <a href="/Admin/Category/Delete/@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                        <a href="/Admin/Cinema/Edit/@item.Id" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="/Admin/Cinema/Delete/@item.Id" class="btn btn-sm btn-danger">Delete</a>
                         </td>
                     </tr>
                 }
         </tbody>
     </table>
+
 </div>

@@ -1,0 +1,39 @@
+﻿<div>
+    <h2>Create Cinema</h2>
+   <form  method="post" enctype="multipart/form-data">
+        <input type="hidden" name="Id" /> 
+        <label for="Name">Cinema Name</label>
+        <input type="text" name="Name" placeholder="Enter Cinema Name" class="form-control" />
+        <br />
+        <div class="mb-3">
+            <label for="Img" class="form-label">Img</label>
+            <input type="File" class="form-control" id="File" name="Img" accept="images/*"
+                   onchange="previewImage(event)" />
+        </div>
+        <div class="mb-3">
+            <img id="preview"
+                 src="~/images/@Model.Img"
+                 alt="Current Files"
+                 style="max-width: 200px; border:1px solid #ccc; padding:5px; border-radius:10px;"     />
+        </div>
+        <br />
+        <input type="submit" value="submit" class="btn btn-sm btn-success" />
+    </form>
+</div>
+
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById("preview");
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result; // الصورة الجديدة
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>

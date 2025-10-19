@@ -2,7 +2,7 @@
 using Book_Movie_Tictet.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Book_Movie_Ticket.Areas.Admin.Controllers
+namespace Book_Movie_Ticket.Areas.Admin.controllers
 {
     [Area("Admin")]
     public class CategoryController : Controller
@@ -11,7 +11,7 @@ namespace Book_Movie_Ticket.Areas.Admin.Controllers
         public IActionResult Index()
         {
             var catecory = _context.Categories.AsQueryable();
-            return View(catecory.AsQueryable());
+            return View(catecory.AsEnumerable());
         }
         [HttpGet]
         public IActionResult Create()

@@ -1,0 +1,109 @@
+﻿@using Book_Movie_Ticket.MovieVM
+@model MovieVM
+<div>
+    <h2>Edit Movie </h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="Id" value="@Model.Movie.Id" />
+        <label for="">Movie Name</label>
+        <input type="text" class="form-control" placeholder="Name" name="Name" value="@Model.Movie.Name" /><br />
+        <label for="">Movie Description</label>
+        <input type="text" class="form-control" placeholder="Description" name="Description" value="@Model.Movie.Description" /><br />
+        <label for="">Movie Price</label>
+        <input type="number" class="form-control" placeholder="Price" name="Price" value="@Model.Movie.Price" /><br />
+        <label for="">Movie DateTime</label>
+        <input type="datetime-local" class="form-control" placeholder="Datetime" name="Datetime" value="@Model.Movie.Datetime.ToString("yyyy-MM-ddTHH:mm")" /><br />
+        <div class="mb-3">
+            <label for="MainImg" class="form-label">Actor Img</label>
+            <input type="File" class="form-control" id="MainImg" name="MainImg" accept="Actorimg/*"
+                   onchange="previewImage(event)" />
+        </div>
+        <div class="mb-3">
+            <img id="preview"
+                 src="~/Movieimg/@Model.Movie.MainImg"
+                 alt="Current Files"
+                 style="max-width: 200px; border:1px solid #ccc; padding:5px; border-radius:10px;"     />
+        </div>
+        <div class="mb-3">
+            <label for="SupImg" class="form-label">Actor SupImg</label>
+            <input type="File" class="form-control" id="SupImg" name="SupImg" multiple
+                   @foreach (var img in Model.MovieSupimg)
+                   {
+                    <img src="~/Moviesupimg/@img.SupImg"
+                     style="max-width: 200px; border:1px solid #ccc; padding:5px; border-radius:10px;" />
+                   }
+                    />
+        </div>
+      
+        <select name="CategoryId" class="form-control">
+            <option>--Select Category--</option>
+            @foreach (var category in Model.Categories)
+            {
+                @if(category.Id == Model.Movie.CategoryId)
+                {
+                    <option value="@category.Id" selected>@category.Name</option>
+                }
+                else
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            }
+        </select>
+        <br />
+        <select name="CinemaId" class="form-control">
+            <option>--Select Cinema--</option>
+            @foreach(var cinema in Model.Cinemas)
+            {
+                @if(cinema.Id == Model.Movie.CinemaId)
+                {
+                    <option value="@cinema.Id" selected>@cinema.Name</option>
+                }
+                else
+                {
+                    <option value="@cinema.Id">@cinema.Name</option>
+                }
+            }
+        </select>
+        <br />
+        <label for="">Select Actor</label><br />
+        <select name="Actors" multiple class="form-control" >
+            <option>--Select Actor--</option>
+         @foreach( var actor in Model.ActorsMovieS)
+            {
+                <option value="@actor.Actor.Id">@actor.Actor.FullName</option>
+            }
+        </select>
+        <br />
+        <label for="">Movie Status</label><br />
+        <select  name="Status" class="form-select">
+            @if (Model.Movie.Status)
+            {
+                <option value="true" selected>Active</option>
+                <option value="false">Inactive</option>
+            }
+            else
+            {
+                <option value="true">Active</option>
+                <option value="false" selected>Inactive</option>
+            }
+        </select>
+        <br />
+        <button type="submit" class="btn btn-primary">Update M</button>
+        </form>
+</div>
+
+        <script>
+            function previewImage(event) {
+                const input = event.target;
+                const preview = document.getElementById("preview");
+
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        preview.src = e.target.result; // الصورة الجديدة
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>

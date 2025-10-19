@@ -1,0 +1,42 @@
+﻿
+@using Book_Movie_Tictet.Models
+@model Actors
+<div>
+    <h2>Create Cinema</h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <label for="FullName">Cinema Name</label>
+        <input type="text" name="FullName" placeholder="Enter Cinema Name" class="form-control" value="@Model.FullName" />
+        <br />
+        <div class="mb-3">
+            <label for="Img" class="form-label">Img</label>
+            <input type="File" class="form-control" id="File" name="Img" value="@Model.Img" accept="Actorimg/*"
+                   onchange="previewImage(event)" />
+        </div>
+        <div class="mb-3">
+            <img id="preview"
+                 src="~/Actorimg/@Model.Img"
+                 alt="Current Files"
+                 style="max-width: 200px; border:1px solid #ccc; padding:5px; border-radius:10px;"     />
+        </div>
+        <br />
+        <input type="submit" value="submit" class="btn btn-sm btn-success" />
+    </form>
+</div>
+
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById("preview");
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result; // الصورة الجديدة
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
