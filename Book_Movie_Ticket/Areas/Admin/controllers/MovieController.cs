@@ -155,10 +155,8 @@ namespace Book_Movie_Tictet.Controllers
                 {
                        movie.MainImg = existingMovie.MainImg;
                 }
-
-                var movieid = _context.Movies.Update(movie);
+                _context.Movies.Update(movie);
                 _context.SaveChanges();
-
                 if (SupImg is not null && SupImg.Count > 0)
                 {
                     
@@ -172,7 +170,9 @@ namespace Book_Movie_Tictet.Controllers
                             System.IO.File.Delete(oldPath);
                         }
                     }
-                  
+                    _context.MovieSupimgs.RemoveRange(oldSupImgs);
+                    _context.SaveChanges();
+                     
                     foreach (var supImg in SupImg)
                     {
                         var filename = Guid.NewGuid().ToString() + Path.GetExtension(supImg.FileName);
@@ -192,9 +192,7 @@ namespace Book_Movie_Tictet.Controllers
                     }
                     _context.SaveChanges();
                 }
-
-                _context.Movies.Update(movie);
-                _context.SaveChanges();
+              
                 return RedirectToAction("Index");
             }
             return View(movie);
@@ -204,7 +202,7 @@ namespace Book_Movie_Tictet.Controllers
             var movie = _context.Movies.FirstOrDefault(m => m.Id == id);
             var movieSupimgs = _context.MovieSupimgs.Where(ms => ms.MovieId == id).ToList();
             var actorsMovies = _context.ActorsMovies.Where(am => am.MovieId == id).ToList();
-            if (movie is null&& movieSupimgs is not null && actorsMovies is not null)
+            if (movie is null && movieSupimgs is  null && actorsMovies is  null)
             {
                 return NotFound();
             }
