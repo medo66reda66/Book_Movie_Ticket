@@ -25,15 +25,18 @@
         </div>
         <div class="mb-3">
             <label for="SupImg" class="form-label">Actor SupImg</label>
-            <input type="File" class="form-control" id="SupImg" name="SupImg" multiple
+            <input type="File" class="form-control" id="SupImg" name="SupImg" multiple />
+        </div>
                    @foreach (var img in Model.MovieSupimg)
                    {
-                    <img src="~/Moviesupimg/@img.SupImg"
-                     style="max-width: 200px; border:1px solid #ccc; padding:5px; border-radius:10px;" />
+                        <div class="mb-3">
+                            <img 
+                                src="~/Moviesupimg/@img.SupImg"
+                                 alt="Current Files"
+                                 style="max-width: 200px; border:1px solid #ccc; padding:5px; border-radius:10px;"     />
+                        </div>
                    }
-                    />
-        </div>
-      
+                   
         <select name="CategoryId" class="form-control">
             <option>--Select Category--</option>
             @foreach (var category in Model.Categories)

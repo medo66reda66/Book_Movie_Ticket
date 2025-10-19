@@ -155,37 +155,44 @@ namespace Book_Movie_Tictet.Controllers
                 {
                        movie.MainImg = existingMovie.MainImg;
                 }
+
+                var movieid = _context.Movies.Update(movie);
+                _context.SaveChanges();
+
                 if (SupImg is not null && SupImg.Count > 0)
                 {
+                    
+                    var oldSupImgs = _context.MovieSupimgs.Where(ms => ms.MovieId == movie.Id).ToList();
+
+                    foreach (var old in oldSupImgs)
+                    {
+                        var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Moviesupimg", old.SupImg);
+                        if (System.IO.File.Exists(oldPath))
+                        {
+                            System.IO.File.Delete(oldPath);
+                        }
+                    }
+                  
                     foreach (var supImg in SupImg)
                     {
                         var filename = Guid.NewGuid().ToString() + Path.GetExtension(supImg.FileName);
-                        var pathname = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Moviesupimg", filename);
-                        using (var stream = System.IO.File.Create(pathname))
+                        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Moviesupimg", filename);
+
+                        using (var stream = System.IO.File.Create(path))
                         {
                             supImg.CopyTo(stream);
                         }
-                        foreach (var ms in _context.MovieSupimgs.Where(ms => ms.MovieId == movie.Id))
-                        {
-                            var oldSupimgPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Moviesupimg", ms.SupImg);
-                            if (System.IO.File.Exists(oldSupimgPath))
-                            {
-                                System.IO.File.Delete(oldSupimgPath);
-                            }
-                        }
-                        var movieSupimg = new MovieSupimg
+
+                        _context.MovieSupimgs.Add(  new MovieSupimg
                         {
                             MovieId = movie.Id,
-                            SupImg = filename,
-                        };
+                            SupImg = filename
+                        });
+                        
                     }
-                }else
-                {
-                    foreach (var supimg in _context.MovieSupimgs.Where(ms => ms.MovieId == movie.Id))
-                    {
-                        movie.MainImg = existingMovie.MainImg;
-                    }
+                    _context.SaveChanges();
                 }
+
                 _context.Movies.Update(movie);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
