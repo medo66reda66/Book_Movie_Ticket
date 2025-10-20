@@ -32,9 +32,9 @@
                     <td>@item.Cinema.Name</td>
                     <td>@item.Category.Name</td>
                     <td>
-                        @foreach (var actor in item.Actors)
+                        @foreach (var actor in item.ActorsMovies)
                         {
-                            <h3>@actor.FullName</h3><br />
+                            <h8>@actor.Actor.FullName</h8><br />
                         }
                     </td>
                     <td>@item.Datetime</td>

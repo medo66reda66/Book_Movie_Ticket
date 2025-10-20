@@ -14,7 +14,11 @@ namespace Book_Movie_Tictet.Controllers
         private ApplicationDBContext _context = new ApplicationDBContext();
         public IActionResult Index()
         {
-            var allMovies = _context.Movies.Include(e => e.Category).Include(e => e.Actors).Include(e => e.Supimg).Include(c => c.Cinema).Include(a => a.ActorsMovies).AsQueryable();
+            var allMovies = _context.Movies.Include(e => e.Category)
+                .Include(e => e.Actors).Include(e => e.Supimg)
+                .Include(c => c.Cinema).Include(a => a.ActorsMovies)
+                .ThenInclude(e=>e.Actor).AsQueryable();
+
             var categories = _context.Categories.AsQueryable();
             var cinemas = _context.Cinemas.AsQueryable();
             var actors = _context.Actors.AsQueryable();
@@ -29,13 +33,12 @@ namespace Book_Movie_Tictet.Controllers
                 MovieSupimg = supimg.AsEnumerable(),
                 MovieSupimgs = new MovieSupimg(),
                 ActorsMovieS = new List<ActorsMovie>()
-              
             });
         }
         [HttpGet]
         public IActionResult Create()
         {
-            var allMovies = _context.Movies.Include(e => e.Category).Include(c => c.Cinema).Include(a => a.Actors).AsQueryable();
+            var allMovies = _context.Movies.Include(e => e.Category).Include(c => c.Cinema).AsQueryable();
             var categories = _context.Categories.AsQueryable();
             var cinemas = _context.Cinemas.AsQueryable();
             var actors = _context.Actors.AsQueryable();
@@ -54,7 +57,7 @@ namespace Book_Movie_Tictet.Controllers
             });
         }
         [HttpPost]
-        public IActionResult Create(Movie movie, IFormFile MainImg, List<IFormFile>? SupImg, List<Actors>? Actors)
+        public IActionResult Create(Movie movie, IFormFile MainImg, List<IFormFile>? SupImg,List<int> Actors)
         {
             if (movie is not null)
             {
@@ -70,7 +73,7 @@ namespace Book_Movie_Tictet.Controllers
                 }
                 var movieid = _context.Movies.Add(movie);
                 _context.SaveChanges();
-                
+
                 if (SupImg is not null && SupImg.Count > 0)
                 {
                     foreach (var supImg in SupImg)
@@ -89,20 +92,16 @@ namespace Book_Movie_Tictet.Controllers
                         _context.SaveChanges();
                     }
                 }
-
-                if (Actors is not null)
-                {
-                    foreach (var A in Actors)
+                foreach (var actor in Actors)
+                { 
+                    _context.ActorsMovies.Add(new ActorsMovie
                     {
-                        _context.ActorsMovies.Add( new ActorsMovie
-                        {
-                            ActorId = A.Id,
-                            MovieId = movieid.Entity.Id,
-                        });
-                        _context.SaveChanges();
-                    }
-                }
-               
+                        ActorId = actor,
+                        MovieId = movieid.Entity.Id,
+                    });
+                _context.SaveChanges();
+                  }
+                
                 return RedirectToAction("Index");
             }
             return View(movie);

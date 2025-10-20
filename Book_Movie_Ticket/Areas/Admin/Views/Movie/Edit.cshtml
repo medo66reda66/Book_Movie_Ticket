@@ -70,9 +70,9 @@
         <label for="">Select Actor</label><br />
         <select name="Actors" multiple class="form-control" >
             <option>--Select Actor--</option>
-         @foreach( var actor in Model.ActorsMovieS)
+         @foreach( var actor in Model.Actors)
             {
-                <option value="@actor.Actor.Id">@actor.Actor.FullName</option>
+                <option value="@actor.Id" >@actor.FullName</option>
             }
         </select>
         <br />
