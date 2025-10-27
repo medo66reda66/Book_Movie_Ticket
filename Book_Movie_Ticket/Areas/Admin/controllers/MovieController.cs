@@ -239,14 +239,14 @@ namespace Book_Movie_Tictet.Controllers
         }
         public async Task<IActionResult> Delete(int id ,CancellationToken cancellationToken)
         {
-            var movie = await _movieIRepository.GetoneAsync(m => m.Id == id, includ:[m=>m.ActorsMovies] , cancellationToken:cancellationToken);
-            var moviesupimg = await _movieSupimgIRepository.GetAllAsync(m => m.MovieId == id, cancellationToken: cancellationToken);
+            var movie = await _movieIRepository.GetoneAsync(m => m.Id == id, includ:[m=>m.ActorsMovies,e=>e.Supimg] , cancellationToken:cancellationToken);
+           
 
-            if (movie is null && moviesupimg is null )
+            if (movie is null )
             {
                 return NotFound();
             }
-            _movieSupimgIRepository.RemoveRange(moviesupimg);
+            
             _movieIRepository.Delete(movie);
             await _movieIRepository.commitASync(cancellationToken:cancellationToken);
             //_context.Movies.Remove(movie);
