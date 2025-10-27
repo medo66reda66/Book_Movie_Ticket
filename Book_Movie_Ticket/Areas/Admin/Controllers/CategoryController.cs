@@ -1,16 +1,26 @@
-﻿using Book_Movie_Tictet.data;
+﻿using Book_Movie_Ticket.Repository;
+using Book_Movie_Ticket.Repository.IRepository;
+using Book_Movie_Tictet.data;
 using Book_Movie_Tictet.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Book_Movie_Ticket.Areas.Admin.controllers
 {
     [Area("Admin")]
     public class CategoryController : Controller
     {
-        private ApplicationDBContext _context = new ApplicationDBContext();
-        public IActionResult Index()
+        //private ApplicationDBContext _context = new ApplicationDBContext();
+        private readonly IRepository<Category> _db ;
+
+        public CategoryController(IRepository<Category> db)
         {
-            var catecory = _context.Categories.AsQueryable();
+            _db = db;
+        }
+
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        {
+            var catecory = await _db.GetAllAsync(cancellationToken:cancellationToken);
             return View(catecory.AsEnumerable());
         }
         [HttpGet]
@@ -19,20 +29,31 @@ namespace Book_Movie_Ticket.Areas.Admin.controllers
             return View(new Category());
         }
         [HttpPost]
-        public IActionResult Create(Category category)
+        public async Task<IActionResult> Create(Category category , CancellationToken cancellationToken)
         {
-            if (category is not null)
+            try
             {
-                _context.Categories.Add(category);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                if (category is not null)
+                {
+                    await _db.AddAsync(category, cancellationToken);
+                    await _db.commitASync(cancellationToken);
+                    //_context.Categories.Add(category);
+                    //_context.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                TempData["sucess-Notification"] = "Product Created Successfully";
+            }
+            catch (Exception ex)
+            {
+                TempData["error-Notification"] = "Product Created error";
             }
             return View(category);
         }
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id , CancellationToken cancellationToken)
         {
-            var category = _context.Categories.FirstOrDefault(e => e.Id == id);
+
+            var category = await _db.GetoneAsync(e => e.Id == id, cancellationToken:cancellationToken);
             if (category is null)
             {
                 return NotFound();
@@ -40,23 +61,27 @@ namespace Book_Movie_Ticket.Areas.Admin.controllers
             return View(category);
         }
         [HttpPost]
-        public IActionResult Edit(Category category)
+        public async Task<IActionResult> Edit(Category category,CancellationToken cancellationToken)
         {
             if (category is not null)
             {
-                _context.Categories.Update(category);
-                _context.SaveChanges();
+                _db.Updat(category);
+                await _db.commitASync(cancellationToken);
+            //    _context.Categories.Update(category);
+            //    _context.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(category);
         }
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            var category = _context.Categories.FirstOrDefault(e => e.Id == id);
+            var category = await _db.GetoneAsync(e => e.Id == id, cancellationToken: cancellationToken);
             if (category is not null)
             {
-                _context.Categories.Remove(category);
-                _context.SaveChanges();
+                _db.Delete(category);
+                 await _db.commitASync(cancellationToken);
+                //_context.Categories.Remove(category);
+                //_context.SaveChanges();
                 return RedirectToAction("Index");
             }
             return NotFound();

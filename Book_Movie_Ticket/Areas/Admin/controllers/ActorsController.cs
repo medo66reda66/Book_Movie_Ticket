@@ -1,8 +1,11 @@
-﻿using Book_Movie_Tickets.Models;
+﻿using Book_Movie_Ticket.Repository;
+using Book_Movie_Ticket.Repository.IRepository;
+using Book_Movie_Tickets.Models;
 using Book_Movie_Tictet.data;
 using Book_Movie_Tictet.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Book_Movie_Tictet.Controllers
 {
@@ -10,10 +13,17 @@ namespace Book_Movie_Tictet.Controllers
     public class ActorsController : Controller
     {
 
-        private ApplicationDBContext _context = new ApplicationDBContext();
-        public IActionResult Index()
+        //private ApplicationDBContext _context = new ApplicationDBContext();
+        private readonly IRepository<Actors> _db ;
+
+        public ActorsController(IRepository<Actors> db)
         {
-            var actors = _context.Actors.AsQueryable();
+            _db = db;
+        }
+
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        {
+            var actors = await _db.GetAllAsync(cancellationToken:cancellationToken);
             return View(actors.AsEnumerable());
         }
         [HttpGet]
@@ -22,7 +32,7 @@ namespace Book_Movie_Tictet.Controllers
             return View(new Actors());
         }
         [HttpPost]
-        public IActionResult Create(Actors actor,IFormFile img)
+        public async Task<IActionResult> Create(Actors actor,IFormFile img,CancellationToken cancellationToken)
         {
             if (actor is not null && img is not null)
             {
@@ -34,17 +44,18 @@ namespace Book_Movie_Tictet.Controllers
                 }
                 actor.Img = filename;
             
-
-                _context.Actors.Add(actor);
-                _context.SaveChanges();
+                await _db.AddAsync(actor,cancellationToken);
+                await _db.commitASync(cancellationToken);
+                //_context.Actors.Add(actor);
+                //_context.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(actor);
         }
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id,CancellationToken cancellationToken)
         {
-            var actor = _context.Actors.FirstOrDefault(e => e.Id == id);
+            var actor = await _db.GetoneAsync(e => e.Id == id,cancellationToken:cancellationToken);
             if (actor is null)
             {
                 return NotFound();
@@ -52,43 +63,56 @@ namespace Book_Movie_Tictet.Controllers
             return View(actor);
         }
         [HttpPost]
-        public IActionResult Edit(Actors actor, IFormFile? img)
+        public async Task<IActionResult> Edit(Actors actor, IFormFile? img,CancellationToken cancellationToken)
         {
-            var existingActor = _context.Actors.AsNoTracking().FirstOrDefault(c => c.Id == actor.Id);
-            if (actor is not null)
+            var existingActor = await _db.GetoneAsync(c => c.Id == actor.Id,tracked:false  ,cancellationToken:cancellationToken);
+            try
             {
-                if (img is not null)
+                if (actor is not null)
                 {
-                    var filename = Guid.NewGuid().ToString() + Path.GetExtension(img.FileName);
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Actorimg", filename);
-                    using (var stream = System.IO.File.Create(filePath))
+                    if (img is not null)
                     {
-                        img.CopyTo(stream);
+                        var filename = Guid.NewGuid().ToString() + Path.GetExtension(img.FileName);
+                        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Actorimg", filename);
+                        using (var stream = System.IO.File.Create(filePath))
+                        {
+                            img.CopyTo(stream);
+                        }
+                        var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Actorimg", existingActor.Img);
+                        if (System.IO.File.Exists(oldFilePath))
+                        {
+                            System.IO.File.Delete(oldFilePath);
+                        }
+                        actor.Img = filename;
                     }
-                    var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Actorimg", existingActor.Img);
-                    if (System.IO.File.Exists(oldFilePath))
+                    else
                     {
-                        System.IO.File.Delete(oldFilePath);
+                        actor.Img = existingActor.Img;
                     }
-                    actor.Img = filename;
+                    _db.Updat(actor);
+                    await _db.commitASync(cancellationToken);
+
+                    //_context.Actors.Update(actor);
+                    //_context.SaveChanges();
+                    
+                    TempData["sucess-Notification"] = "Product Created Successfully";
+                    return RedirectToAction("Index");
                 }
-                else
-                {
-                    actor.Img = existingActor.Img;
-                }
-                _context.Actors.Update(actor);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+            } catch (Exception ex)
+            {
+                TempData["error-Notification"] = "Product Created error";
             }
             return View(actor);
         }
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id,CancellationToken cancellationToken)
         {
-            var actor = _context.Actors.FirstOrDefault(e => e.Id == id);
+            var actor = await _db.GetoneAsync(e => e.Id == id,cancellationToken:cancellationToken);
             if (actor is not null)
             {
-                _context.Actors.Remove(actor);
-                _context.SaveChanges();
+                _db.Delete(actor);
+                await _db.commitASync(cancellationToken);
+                //_context.Actors.Remove(actor);
+                //_context.SaveChanges();
 
         
                 return RedirectToAction("Index");

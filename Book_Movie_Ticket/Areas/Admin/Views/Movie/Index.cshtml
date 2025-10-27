@@ -14,7 +14,6 @@
                 <th>MainImg</th>
                 <th>Cinema name</th>
                 <th>Category name</th>
-                <th>list Actor</th>
                 <th>Datetime</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -31,12 +30,6 @@
                     <td>@item.MainImg</td>
                     <td>@item.Cinema.Name</td>
                     <td>@item.Category.Name</td>
-                    <td>
-                        @foreach (var actor in item.ActorsMovies)
-                        {
-                            <h8>@actor.Actor.FullName</h8><br />
-                        }
-                    </td>
                     <td>@item.Datetime</td>
                     @if (item.Status)
                     {

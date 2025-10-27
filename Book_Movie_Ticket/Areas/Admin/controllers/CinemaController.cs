@@ -1,17 +1,28 @@
-﻿using Book_Movie_Tickets.Models;
+﻿using Book_Movie_Ticket.Repository;
+using Book_Movie_Ticket.Repository.IRepository;
+using Book_Movie_Tickets.Models;
 using Book_Movie_Tictet.data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Threading.Tasks;
 
 namespace Book_Movie_Tictet.Controllers
 {
     [Area("Admin")]
     public class CinemaController : Controller
     {
-        private ApplicationDBContext _dbContext = new ApplicationDBContext();
-        public IActionResult Index()
+        //private ApplicationDBContext _dbContext = new ApplicationDBContext();
+        private readonly IRepository<Cinema> _db ;
+
+        public CinemaController(IRepository<Cinema> db)
         {
-            var cinema = _dbContext.Cinemas.AsQueryable();
+            _db = db;
+        }
+
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        {
+            var cinema = await _db.GetAllAsync(cancellationToken:cancellationToken);
             return View(cinema.AsEnumerable());
         }
         [HttpGet]
@@ -20,28 +31,40 @@ namespace Book_Movie_Tictet.Controllers
             return View(new Cinema());
         }
         [HttpPost]
-        public IActionResult Create(Cinema cinema ,IFormFile Img)
+        public async Task<IActionResult> Create(Cinema cinema ,IFormFile Img , CancellationToken cancellationToken)
         {
-            if (cinema is not null && Img is not null)
+            try
             {
-                var filename = Guid.NewGuid().ToString() + Path.GetExtension(Img.FileName);
-                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", filename);
-                using (var stream = System.IO.File.Create(filePath))
+                if (cinema is not null && Img is not null)
                 {
-                    Img.CopyTo(stream);
-                }
-                cinema.Img = filename;
+                    var filename = Guid.NewGuid().ToString() + Path.GetExtension(Img.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", filename);
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        Img.CopyTo(stream);
+                    }
+                    cinema.Img = filename;
 
-                _dbContext.Cinemas.Add(cinema);
-                _dbContext.SaveChanges();
-                return RedirectToAction("Index");
+                    await _db.AddAsync(cinema, cancellationToken);
+                    await _db.commitASync(cancellationToken);
+
+                    //_dbContext.Cinemas.Add(cinema);
+                    //_dbContext.SaveChanges();
+                    return RedirectToAction("Index");
+                    
+                }
+                TempData["sucess-Notification"] = "Product Created Successfully";
+            }
+            catch (Exception ex) 
+            {
+                TempData["error-Notification"] = "Product Created error";
             }
             return View(cinema);
         }
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id , CancellationToken cancellationToken )
         {
-            var cinema = _dbContext.Cinemas.FirstOrDefault(e => e.Id == id);
+            var cinema = await _db.GetoneAsync(e => e.Id == id,tracked:false, cancellationToken:cancellationToken);
             if (cinema is null)
             {
                 return NotFound();
@@ -49,9 +72,9 @@ namespace Book_Movie_Tictet.Controllers
             return View(cinema);
         }
         [HttpPost]
-        public IActionResult Edit(Cinema cinema, IFormFile? Img)
+        public async Task<IActionResult> Edit(Cinema cinema, IFormFile? Img , CancellationToken cancellationToken)
         {
-            var existingCinema = _dbContext.Cinemas.AsNoTracking().FirstOrDefault(c => c.Id == cinema.Id);
+            var existingCinema = await _db.GetoneAsync(c => c.Id == cinema.Id,tracked:false,cancellationToken:cancellationToken);
             if (cinema is not null)
             {
                 if (Img is not null)
@@ -73,19 +96,24 @@ namespace Book_Movie_Tictet.Controllers
                 {
                     cinema.Img = existingCinema.Img;
                 }
-                    _dbContext.Cinemas.Update(cinema);
-                _dbContext.SaveChanges();
+
+                _db.Updat(cinema);
+                await _db.commitASync(cancellationToken);
+                //    _dbContext.Cinemas.Update(cinema);
+                //_dbContext.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(cinema);
         }
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id,CancellationToken cancellationToken)
         {
-            var cinema = _dbContext.Cinemas.FirstOrDefault(e => e.Id == id);
+            var cinema = await _db.GetoneAsync(e => e.Id == id,cancellationToken:cancellationToken);
             if (cinema is not null)
             {
-                _dbContext.Cinemas.Remove(cinema);
-                _dbContext.SaveChanges();
+                _db.Delete(cinema);
+                 await _db.commitASync(cancellationToken);
+                //_dbContext.Cinemas.Remove(cinema);
+                //_dbContext.SaveChanges();
                 return RedirectToAction("Index");
             }
             return NotFound();
