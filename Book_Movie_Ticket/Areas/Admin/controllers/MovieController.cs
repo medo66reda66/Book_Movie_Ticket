@@ -1,4 +1,5 @@
-﻿using Book_Movie_Ticket.Models;
+﻿using Book_Movie_Ticket.FilterMonieVM;
+using Book_Movie_Ticket.Models;
 using Book_Movie_Ticket.MovieVM;
 using Book_Movie_Ticket.Repository;
 using Book_Movie_Ticket.Repository.IRepository;
@@ -39,7 +40,7 @@ namespace Book_Movie_Tictet.Controllers
             _movieSupimgIRepository = movieSupimgIRepository;
         }
 
-        public async Task<IActionResult> Index( CancellationToken cancellationToken)
+        public async Task<IActionResult> Index( CancellationToken cancellationToken ,Filtermovie filtermovie)
         {
             var allMovies = await _movieIRepository.GetAllAsync(includ:[e => e.Actors,e => e.Supimg,c => c.Cinema,e=>e.Category,a=>a.ActorsMovies],cancellationToken:cancellationToken);
             var actormovie = await _ActorsMovieRepository.GetAllAsync(includ: [p => p.Actor],cancellationToken: cancellationToken);
@@ -53,6 +54,35 @@ namespace Book_Movie_Tictet.Controllers
             var cinemas = await _cinemaRepository.GetAllAsync(cancellationToken: cancellationToken);
             var actors = await _ActorsRepository.GetAllAsync(cancellationToken: cancellationToken);
             var supimg = await _MovieSupimgRepository.GetAllAsync(cancellationToken: cancellationToken);
+
+            //add filter
+            if(filtermovie.name is not null)
+            {
+               allMovies = allMovies.Where(a => a.Name.Contains(filtermovie.name.Trim()));
+                ViewBag.name = filtermovie.name;
+            }
+            if(filtermovie.minprice is not null)
+            {
+                allMovies = allMovies.Where(p => p.Price >= filtermovie.minprice);
+                ViewBag.minprice = filtermovie.minprice;
+            }
+            if(filtermovie.maxprice is not null)
+            {
+                allMovies = allMovies.Where(p => p.Price <= filtermovie.maxprice);
+                ViewBag.maxprice = filtermovie.maxprice;
+            }
+            if(filtermovie.categoryid is not null)
+            {
+                allMovies = allMovies.Where(e=>e.CategoryId == filtermovie.categoryid);
+                ViewBag.categoryid = filtermovie.categoryid;
+            }
+            if(filtermovie.cinemaid is not null)
+            {
+                allMovies = allMovies.Where(e=>e.CinemaId == filtermovie.cinemaid);
+                ViewBag.cinemaid = filtermovie.cinemaid;
+            }
+
+   
             return View(new MovieVM
             {
                 Movies = allMovies.AsEnumerable(),
