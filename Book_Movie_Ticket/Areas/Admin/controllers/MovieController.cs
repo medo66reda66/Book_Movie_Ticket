@@ -76,10 +76,15 @@ namespace Book_Movie_Tictet.Controllers
                 allMovies = allMovies.Where(e=>e.CategoryId == filtermovie.categoryid);
                 ViewBag.categoryid = filtermovie.categoryid;
             }
-            if(filtermovie.cinemaid is not null)
+            if (filtermovie.cinemaid is not null)
             {
-                allMovies = allMovies.Where(e=>e.CinemaId == filtermovie.cinemaid);
+                allMovies = allMovies.Where(e => e.CinemaId == filtermovie.cinemaid);
                 ViewBag.cinemaid = filtermovie.cinemaid;
+            }
+            if(filtermovie.status)
+            {
+                allMovies = allMovies.Where(s => s.Status == true);
+                ViewBag.status = filtermovie.status;
             }
 
    
