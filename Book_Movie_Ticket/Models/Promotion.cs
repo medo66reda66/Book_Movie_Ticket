@@ -6,6 +6,7 @@ namespace Book_Movie_Ticket.Models
 {
     public class Promotion
     {
+        [ValidateNever]
         public int id { get; set; }
         public int Movieid { get; set; }
         [ValidateNever]

@@ -38,7 +38,7 @@
                                     <a asp-action="Decrement" asp-route-Movieid="@item.Movieid" class="btn btn-outline-secondary">-</a>
                                 </div>
                                 <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
-                                    <h5 class="mb-0">@(((item.Movie.Price) * (item.count)).ToString("c"))</h5>
+                                    <h5 class="mb-0">@((item.Price * item.count).ToString("c"))</h5>
                                 </div>
                                 <div class="col-md-1 col-lg-1 col-xl-1 text-end">
                                     <a asp-action="Delete" asp-route-Movieid="@item.Movieid" class="btn btn-outline-danger">Delete</a>

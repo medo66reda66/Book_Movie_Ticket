@@ -1,5 +1,6 @@
 ﻿using Book_Movie_Ticket.Models;
 using Book_Movie_Ticket.Repository.IRepository;
+using Book_Movie_Tickets.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -13,12 +14,14 @@ namespace Book_Movie_Ticket.Areas.Customer.controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<Cart> _cartRepository;
         private readonly IRepository<Promotion> _promotionRepository;
+        private readonly IRepository<Movie> _movieRepository;
 
-        public CartController(UserManager<ApplicationUser> userManager, IRepository<Cart> cartRepository, IRepository<Promotion> promotionRepository)
+        public CartController(UserManager<ApplicationUser> userManager, IRepository<Cart> cartRepository, IRepository<Promotion> promotionRepository, IRepository<Movie> movieRepository)
         {
             _userManager = userManager;
             _cartRepository = cartRepository;
             _promotionRepository = promotionRepository;
+            _movieRepository = movieRepository;
         }
 
 
@@ -38,7 +41,7 @@ namespace Book_Movie_Ticket.Areas.Customer.controllers
                 var cartitem = cart.FirstOrDefault(e => e.Movieid == promotion.Movieid);
                 if (cartitem is not null)
                 {
-                    var discountAmount = (cartitem.Price * promotion.Discount) / 100;
+                    var discountAmount = cartitem.Price * (promotion.Discount / 100);
                     cartitem.Price -= discountAmount;
                 }
                await _cartRepository.commitASync(cancellationToken);
@@ -65,7 +68,7 @@ namespace Book_Movie_Ticket.Areas.Customer.controllers
                 Movieid = Movieid,
                 count = count,
                 ApplicationUserId = user.Id,
-                Price=(await _cartRepository.GetoneAsync(e=>e.Movieid == Movieid, cancellationToken:cancellationToken)).Price
+                Price =(decimal)(await _movieRepository.GetoneAsync(e=>e.Id == Movieid, cancellationToken:cancellationToken)).Price
             },cancellationToken);
 
            await _cartRepository.commitASync(cancellationToken);
