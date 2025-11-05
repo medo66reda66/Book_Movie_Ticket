@@ -1,0 +1,346 @@
+﻿@using Book_Movie_Tickets.Models
+@model IEnumerable<Movie>
+
+<div class="container">
+
+    <h1 style="text-align:center; margin-top:20px;">Show All Movies 🎬</h1>
+
+    <h5>🎬 Filter Movies</h5>
+
+    <form class="border p-3 rounded bg-light mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <label>Name</label>
+                <input type="text" placeholder="movie name" name="name" class="form-control" value="@ViewBag.name" />
+            </div>
+
+            <div class="col-md-2">
+                <label>Min Price</label>
+                <input type="number" step="0.01" name="minprice" class="form-control" value="@ViewBag.minprice" />
+            </div>
+
+            <div class="col-md-2">
+                <label>Max Price</label>
+                <input type="number" step="0.01" name="maxprice" class="form-control" value="@ViewBag.maxprice" />
+            </div>
+
+            <div class="col-md-2">
+                <label>Category</label>
+                <select name="categoryid" class="form-select">
+                    <option>-- All category name  --</option>
+
+                    @foreach (var item in ViewBag.category)
+                    {
+                        if (item.Id == ViewBag.categoryid)
+                        {
+                            <option value="@item.Id" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    }
+
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label>Cinema</label>
+                <select name="cinemaid" class="form-select">
+                    <option>-- All cinema name --</option>
+
+                    @foreach (var item in ViewBag.cinema)
+                    {
+                        if (item.Id == ViewBag.cinemaid)
+                        {
+                            <option value="@item.Id" selected>@item.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id">@item.Name</option>
+                        }
+                    }
+
+                </select>
+
+                <div class="form-check form-check-inline mt-2">
+                    <input class="form-check-input mt-1" type="checkbox" id="statusCheck" name="status"
+                           value="true" @(ViewBag.status is not null && ViewBag.status ? "checked" : "")>
+                    <label class="" for="statusCheck">Status Active</label>
+                </div>
+
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end mt-0">
+                <button type="submit" class="btn btn-primary w-50">Filter</button>
+            </div>
+        </div>
+    </form>
+
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 mt-5">
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+              
+                @foreach(var item in Model)
+                {
+                    <div class="col mb-5">
+                        <div class="card h-100">
+                            <!-- Category badge-->
+                            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">@item.Category.Name</div>
+                            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; left: 0.5rem">@item.Cinema.Name</div>
+                           
+                            @* <div class="badge bg-danger text-white position-absolute" style="top: 0.5rem; left: 0.5rem"></div> *@
+
+                            <!-- Product image-->
+                            <img class="card-img-top" src="~/Movieimg/@item.MainImg" alt="..." />
+                            <!-- Product details-->
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <!-- Product name-->
+                                    <h5 class="fw-bolder">@item.Name</h5>
+                                    <!-- Actors-->
+                                    @* @foreach (var Actor in ViewBag.actors)
+                                    {
+                                        <h6>Actor: @Actor.Actor.FullName</h6>
+                                    } *@
+                                    <!-- Product price-->
+                                    <span class="text-muted text">@item.Price.ToString("c")</span>
+                                </div>
+                            </div>
+                            <!-- Product actions-->
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="Customer/Home/Item/@item.Id">Add to cart</a></div>
+                            </div>
+                        </div>
+                    </div>
+
+                   }
+            </div>
+
+            @* <div class="row">
+                <nav aria-label="Page navigation example" style="justify-content: center;display: flex;">
+                    <ul class="pagination">
+                        @if (@ViewBag.CurrentPage > 1)
+                        {
+                            <li class="page-item"><a class="page-link" href="?page=@(ViewBag.CurrentPage - 1)&name=@ViewBag.Name&minPrice=@ViewBag.minPrice&maxPrice=@ViewBag.maxPrice&categoryId=@ViewBag.categoryId&brandId=@ViewBag.brandId&IsHot=@ViewBag.IsHot">Previous</a></li>
+                        }
+                        @for (var i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item"><a class="page-link" href="?page=@i&name=@ViewBag.Name&minPrice=@ViewBag.minPrice&maxPrice=@ViewBag.maxPrice&categoryId=@ViewBag.categoryId&brandId=@ViewBag.brandId&IsHot=@ViewBag.IsHot">@i</a></li>
+                        }
+                        @if (@ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <li class="page-item"><a class="page-link" href="?page=@(ViewBag.CurrentPage + 1)&name=@ViewBag.Name&minPrice=@ViewBag.minPrice&maxPrice=@ViewBag.maxPrice&categoryId=@ViewBag.categoryId&brandId=@ViewBag.brandId&IsHot=@ViewBag.IsHot">Next</a></li>
+                        }
+                    </ul>
+                </nav>
+            </div> *@
+        </div>
+    </section>
+</div>
+
+@* @section Scripts {
+    <partial name="_NotificationPartial" />
+} *@
+
+<style>
+body {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #f8fafc;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* 🎬 العنوان الرئيسي */
+h1 {
+    color: #38bdf8;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0px 0px 10px rgba(56, 189, 248, 0.6);
+}
+
+/* 🧩 فورم الفلترة */
+    form {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 14px;
+        padding: 25px 20px;
+        margin-top: 5px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        transition: all 0.4s ease;
+    }
+
+        form:hover {
+            box-shadow: 0 8px 30px rgba(56, 189, 248, 0.3);
+            transform: scale(1.01);
+        }
+
+    /* 🧾 العناوين */
+    h5 {
+        color: #38bdf8;
+        font-weight: 700;
+        margin-bottom: 15px;
+        letter-spacing: 0.5px;
+    }
+
+    /* 📋 تسميات الحقول */
+    label {
+        display: block;
+        font-weight: 600;
+        color: #cbd5e1;
+        margin-bottom: 6px;
+        font-size: 0.95rem;
+    }
+
+    /* 🧩 الحقول */
+    input.form-control,
+    select.form-select {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        color: #f8fafc;
+        border-radius: 10px;
+        padding: 10px 12px;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 0 5px rgba(56, 189, 248, 0.1);
+    }
+
+        input.form-control:focus,
+        select.form-select:focus {
+            border-color: #0ea5e9;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+    /* 🎟️ Checkbox */
+    .form-check-input {
+        border: 2px solid #38bdf8;
+        background-color: transparent;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .form-check-input:checked {
+            background-color: #38bdf8;
+            border-color: #38bdf8;
+            box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+        }
+
+    label[for="statusCheck"] {
+        color: #e2e8f0;
+        font-weight: 500;
+    }
+
+    /* 🔘 زر الفلترة */
+    button.btn-primary {
+        background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+        border: none;
+        font-weight: 700;
+        color: #f8fafc;
+        letter-spacing: 0.5px;
+        padding: 10px 0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+        button.btn-primary:hover {
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+
+    /* 📱 تجاوب الفلتر */
+     (max-width: 768px) {
+        form
+
+    {
+        padding: 15px;
+    }
+
+    button.btn-primary {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    label {
+        font-size: 0.85rem;
+    }
+
+    }
+
+/* 🍿 كروت الأفلام */
+.card {
+    border: none;
+    background-color: #1e293b;
+    color: #f8fafc;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3);
+}
+
+/* 🖼️ صورة الفيلم */
+.card-img-top {
+    height: 300px;
+    object-fit: cover;
+    border-bottom: 2px solid #38bdf8;
+}
+
+/* 🎟️ البادجات */
+.badge {
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background-color: #0ea5e9 !important;
+}
+
+/* 💰 السعر */
+.text-muted.text {
+    color: #38bdf8 !important;
+    font-weight: 600;
+}
+
+/* 🛒 زر Add to cart */
+.btn-outline-dark {
+    color: #38bdf8;
+    border: 1px solid #38bdf8;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-dark:hover {
+    background: #38bdf8;
+    color: #0f172a;
+    transform: scale(1.05);
+}
+
+/* ✅ Checkbox تنسيق */
+.form-check-input {
+    border: 2px solid #38bdf8;
+    background-color: transparent;
+}
+
+.form-check-input:checked {
+    background-color: #38bdf8;
+    border-color: #38bdf8;
+}
+
+/* 📱 تجاوب الصفحة */
+ (max-width: 768px) {
+    form .row > div {
+        margin-bottom: 12px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .card-img-top {
+        height: 220px;
+    }
+}
+</style>

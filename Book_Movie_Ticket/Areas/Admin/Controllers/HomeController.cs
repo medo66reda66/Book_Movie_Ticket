@@ -1,10 +1,13 @@
-using System.Diagnostics;
 using Book_Movie_Ticket.Models;
+using Book_Movie_Ticket.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Book_Movie_Ticket.Areas.Admin.controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE},{SD.EMPLOYEE_ROLE}")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

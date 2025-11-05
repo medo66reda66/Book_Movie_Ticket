@@ -1,5 +1,6 @@
 ﻿@using Book_Movie_Ticket.MovieVM
-@model MovieVM
+@using Book_Movie_Ticket.Utilities
+@model  MovieVM
 
 <h2>🎬 Filter Movies</h2>
 
@@ -112,12 +113,43 @@
                     {
                         <td><span class="badge text-bg-danger">Inactive</span></td>
                     }
-                    <td>
-                        <a href="/Admin/Movie/Edit/@item.Id" type="button" class="btn btn-warning">Edit</a>
-                        <a href="/Admin/Movie/Delete/@item.Id" type="button" class="btn btn-danger btn-delete">Delete</a>
-                    </td>
+                    @if(User.IsInRole(SD.SUPER_ADMIN_ROLE)||User.IsInRole(SD.ADMIN_ROLE))
+                    {
+                        <td>
+                            <a href="/Admin/Movie/Edit/@item.Id" type="button" class="btn btn-warning">Edit</a>
+                            <a href="/Admin/Movie/Delete/@item.Id" type="button" class="btn btn-danger btn-delete">Delete</a>
+                        </td>
+                    }else
+                    {
+                        <td>NO Action</td>
+                    }
                 </tr>
             }
         </tbody>
     </table>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        </ul>
+    </nav>
+
 </div>
+
+                    @section Scripts{
+                         @if (@TempData["success_notification"] is not null)
+                        {
+                            <script>
+                                    toastr.success['@TempData["success_notification"]'];
+                            </script>
+                        }
+                        else if (@TempData["error_notification"] is not null)
+                        {
+                            <script>
+                                toastr.error['@TempData["error_notification"]'];
+                            </script>
+                        }
+                    }

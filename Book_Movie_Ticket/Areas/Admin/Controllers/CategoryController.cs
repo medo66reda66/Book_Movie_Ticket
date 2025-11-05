@@ -1,13 +1,16 @@
-﻿using Book_Movie_Ticket.Repository;
+﻿using Book_Movie_Ticket.data;
+using Book_Movie_Ticket.Repository;
 using Book_Movie_Ticket.Repository.IRepository;
-using Book_Movie_Tictet.data;
+using Book_Movie_Ticket.Utilities;
 using Book_Movie_Tictet.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
 namespace Book_Movie_Ticket.Areas.Admin.controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE},{SD.EMPLOYEE_ROLE}")]
     public class CategoryController : Controller
     {
         //private ApplicationDBContext _context = new ApplicationDBContext();
@@ -50,6 +53,7 @@ namespace Book_Movie_Ticket.Areas.Admin.controllers
             return View(category);
         }
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id , CancellationToken cancellationToken)
         {
 
@@ -61,6 +65,7 @@ namespace Book_Movie_Ticket.Areas.Admin.controllers
             return View(category);
         }
         [HttpPost]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(Category category,CancellationToken cancellationToken)
         {
             if (category is not null)
@@ -73,6 +78,7 @@ namespace Book_Movie_Ticket.Areas.Admin.controllers
             }
             return View(category);
         }
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
             var category = await _db.GetoneAsync(e => e.Id == id, cancellationToken: cancellationToken);

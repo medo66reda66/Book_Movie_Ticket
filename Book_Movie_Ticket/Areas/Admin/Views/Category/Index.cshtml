@@ -1,4 +1,5 @@
-﻿@using Book_Movie_Tictet.Models
+﻿@using Book_Movie_Ticket.Utilities
+@using Book_Movie_Tictet.Models
 @model IEnumerable<Category>
 
 <div>
@@ -19,10 +20,17 @@
                     <tr>
                         <td>@item.Id</td>
                         <td>@item.Name</td>
+                    @if (User.IsInRole(SD.SUPER_ADMIN_ROLE) || User.IsInRole(SD.ADMIN_ROLE))
+                    {
                         <td>
-                        <a href="/Admin/Category/Edit/@item.Id" class="btn btn-sm btn-primary">Edit</a>
-                        <a href="/Admin/Category/Delete/@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                            <a href="/Admin/Movie/Edit/@item.Id" type="button" class="btn btn-warning">Edit</a>
+                            <a href="/Admin/Movie/Delete/@item.Id" type="button" class="btn btn-danger btn-delete">Delete</a>
                         </td>
+                    }
+                    else
+                    {
+                        <td>NO Action</td>
+                    }
                     </tr>
                 }
         </tbody>

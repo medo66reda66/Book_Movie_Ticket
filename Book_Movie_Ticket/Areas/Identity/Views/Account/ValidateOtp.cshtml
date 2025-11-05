@@ -1,0 +1,34 @@
+﻿@model Book_Movie_Ticket.MovieVM.ValidateVM
+
+@{
+    ViewData["Title"] = "ValidateOtp";
+}
+
+<h1>ValidateOtp</h1>
+
+<h4>ValidateVM</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ValidateOtp">
+            <input type="hidden" name="ApplicationUserId" value="@Model.ApplicationUserId" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="OTP" class="control-label"></label>
+                <input asp-for="OTP" class="form-control" />
+                <span asp-validation-for="OTP" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

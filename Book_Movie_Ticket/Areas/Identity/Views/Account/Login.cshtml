@@ -1,0 +1,214 @@
+﻿@model Book_Movie_Ticket.MovieVM.loginVm
+
+@{
+    ViewData["Title"] = "Login";
+}
+<div class="container">
+<h1>Login</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Login">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="UsernameORemail" class="control-label"></label>
+                <input asp-for="UsernameORemail" class="form-control" />
+                <span asp-validation-for="UsernameORemail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PaSsword" class="control-label"></label>
+                <input asp-for="PaSsword" class="form-control" />
+                <span asp-validation-for="PaSsword" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Rememberme" /> @Html.DisplayNameFor(model => model.Rememberme)
+                </label>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+<div>
+      <a asp-action="Register">Register</a>
+</div>
+<div>
+        <a asp-action="ResendEmailConfirm">Resend Email Confirm</a>
+</div>
+<div>
+        <a asp-action="ForgetPassword">Forget Password</a>
+</div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+            
+<style>
+    * {
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+    }
+
+    body {
+        margin: 0;
+        background: #f4f4f4;
+    }
+
+    .wrapper {
+        display: flex;
+        height: 100vh;
+        width: 100%;
+    }
+
+    /* ✅ الجزء الأيسر – الـ Form */
+    .form-container {
+        width: 50%;
+        background: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 50px;
+    }
+
+    .form-container h2 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #7b2ff7;
+        margin-bottom: 25px;
+    }
+
+    form {
+        width: 100%;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    input {
+        padding: 10px;
+        border: none;
+        border-radius: 50px;
+        background: #f2f2f2;
+        margin-bottom: 15px;
+        font-size: 15px;
+        outline: none;
+        padding-left: 15px;
+        transition: 0.3s;
+    }
+
+    input:focus {
+        background: #e9e9e9;
+        box-shadow: 0 0 0 2px #a66eff;
+    }
+
+    .btn {
+        background: linear-gradient(45deg, #7a29ff, #c155ff);
+        border: none;
+        color: white;
+        padding: 12px;
+        border-radius: 50px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s;
+    }
+
+    .btn:hover {
+        transform: scale(1.05);
+        background: linear-gradient(45deg, #671fd8, #aa46e9);
+    }
+
+    .links {
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    .links a {
+        color: #7a29ff;
+        text-decoration: none;
+        font-size: 14px;
+        margin: 0 5px;
+    }
+
+    .links a:hover {
+        text-decoration: underline;
+    }
+
+    /* ✅ الجزء الأيمن – الشكل البنفسجي */
+    .side-info {
+        width: 50%;
+        background: linear-gradient(135deg, #7b2ff7, #c155ff);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 80px;
+        border-top-left-radius: 80px;
+        border-bottom-left-radius: 80px;
+    }
+
+    .side-info h1 {
+        font-size: 38px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .side-info p {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        max-width: 400px;
+    }
+
+    .side-info button {
+        border: 2px solid #fff;
+        background: transparent;
+        color: #fff;
+        border-radius: 50px;
+        padding: 10px 25px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .side-info button:hover {
+        background: #fff;
+        color: #7b2ff7;
+    }
+
+     (max-width: 900px) {
+        .wrapper {
+            flex-direction: column;
+            height: auto;
+        }
+
+        .form-container,
+        .side-info {
+            width: 100%;
+            border-radius: 0;
+        }
+
+        .side-info {
+            align-items: center;
+            text-align: center;
+        }
+    }
+</style>

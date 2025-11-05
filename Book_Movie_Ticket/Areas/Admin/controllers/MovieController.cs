@@ -4,18 +4,21 @@ using Book_Movie_Ticket.MovieVM;
 using Book_Movie_Ticket.Repository;
 using Book_Movie_Ticket.Repository.IRepository;
 using Book_Movie_Tickets.Models;
-using Book_Movie_Tictet.data;
-using Book_Movie_Tictet.Models;
+using Book_Movie_Ticket.data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Book_Movie_Tictet.Models;
+using Microsoft.AspNetCore.Authorization;
+using Book_Movie_Ticket.Utilities;
 
 namespace Book_Movie_Tictet.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles =$"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE},{SD.EMPLOYEE_ROLE}")]
     public class MovieController : Controller
     {
-        //private ApplicationDBContext _context = new ApplicationDBContext();
+        private ApplicationDBContext _context ;
         private readonly IRepository<Cinema> _cinemaRepository;
         private readonly IRepository<Category> _CategoryRepository;
         private readonly IRepository<Actors> _ActorsRepository;
@@ -28,7 +31,7 @@ namespace Book_Movie_Tictet.Controllers
 
         public MovieController(IRepository<Cinema> cinemaRepository, IRepository<Category> categoryRepository, IRepository<Actors> actorsRepository,
             IRepository<MovieSupimg> movieSupimgRepository, IRepository<Movie> movieRepository, IRepository<ActorsMovie> actorsMovieRepository,
-            MovieIRepository movieIRepository, movieSupimgIRepository movieSupimgIRepository)
+            MovieIRepository movieIRepository, movieSupimgIRepository movieSupimgIRepository, ApplicationDBContext context)
         {
             _cinemaRepository = cinemaRepository;
             _CategoryRepository = categoryRepository;
@@ -38,9 +41,12 @@ namespace Book_Movie_Tictet.Controllers
             _ActorsMovieRepository = actorsMovieRepository;
             _movieIRepository = movieIRepository;
             _movieSupimgIRepository = movieSupimgIRepository;
+            _context = context;
         }
 
-        public async Task<IActionResult> Index( CancellationToken cancellationToken ,Filtermovie filtermovie)
+
+
+        public async Task<IActionResult> Index( CancellationToken cancellationToken ,Filtermovie filtermovie ,int page =1)
         {
             var allMovies = await _movieIRepository.GetAllAsync(includ:[e => e.Actors,e => e.Supimg,c => c.Cinema,e=>e.Category,a=>a.ActorsMovies],cancellationToken:cancellationToken);
             var actormovie = await _ActorsMovieRepository.GetAllAsync(includ: [p => p.Actor],cancellationToken: cancellationToken);
@@ -87,6 +93,9 @@ namespace Book_Movie_Tictet.Controllers
                 ViewBag.status = filtermovie.status;
             }
 
+            ViewBag.totalpage = Math.Ceiling(allMovies.Count() / 5.0); // عدد الصغاحات
+             allMovies.Skip((page-1)*5).Take(5); // بقوله هات اول خمسه
+            ViewBag.cureentpage = page;// الي واقف عليها
    
             return View(new MovieVM
             {
@@ -125,55 +134,63 @@ namespace Book_Movie_Tictet.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Movie movie, IFormFile MainImg, List<IFormFile>? SupImg,List<int> Actors,CancellationToken cancellationToken)
         {
-            if (movie is not null)
+            try
             {
-                if (MainImg is not null && MainImg.Length > 0)
+                if (movie is not null)
                 {
-                    var filename = Guid.NewGuid().ToString() + Path.GetExtension(MainImg.FileName);
-                    var pathname = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Movieimg", filename);
-                    using (var stream = System.IO.File.Create(pathname))
+                    if (MainImg is not null && MainImg.Length > 0)
                     {
-                        MainImg.CopyTo(stream);
-                    }
-                    movie.MainImg = filename;
-                }
-                var movieid = await _movieIRepository.AddAsync(movie,cancellationToken:cancellationToken);
-                  await _movieIRepository.commitASync(cancellationToken);
-
-                if (SupImg is not null && SupImg.Count > 0)
-                {
-                    foreach (var supImg in SupImg)
-                    {
-                        var filename = Guid.NewGuid().ToString() + Path.GetExtension(supImg.FileName);
-                        var pathname = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Moviesupimg", filename);
+                        var filename = Guid.NewGuid().ToString() + Path.GetExtension(MainImg.FileName);
+                        var pathname = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Movieimg", filename);
                         using (var stream = System.IO.File.Create(pathname))
                         {
-                            supImg.CopyTo(stream);
+                            MainImg.CopyTo(stream);
                         }
-                        await _MovieSupimgRepository.AddAsync(new MovieSupimg
+                        movie.MainImg = filename;
+                    }
+                    var movieid = await _movieIRepository.AddAsync(movie, cancellationToken: cancellationToken);
+                    await _movieIRepository.commitASync(cancellationToken);
+
+                    if (SupImg is not null && SupImg.Count > 0)
+                    {
+                        foreach (var supImg in SupImg)
                         {
+                            var filename = Guid.NewGuid().ToString() + Path.GetExtension(supImg.FileName);
+                            var pathname = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\Moviesupimg", filename);
+                            using (var stream = System.IO.File.Create(pathname))
+                            {
+                                supImg.CopyTo(stream);
+                            }
+                            await _MovieSupimgRepository.AddAsync(new MovieSupimg
+                            {
+                                MovieId = movieid.Id,
+                                SupImg = filename,
+                            }, cancellationToken);
+
+                            await _MovieSupimgRepository.commitASync(cancellationToken: cancellationToken);
+                        }
+                    }
+                    foreach (var actor in Actors)
+                    {
+                        await _ActorsMovieRepository.AddAsync(new ActorsMovie
+                        {
+                            ActorId = actor,
                             MovieId = movieid.Id,
-                            SupImg = filename,
-                        },cancellationToken);
-                        
-                        await _MovieSupimgRepository.commitASync(cancellationToken:cancellationToken);
+                        }, cancellationToken);
+                        await _ActorsMovieRepository.commitASync(cancellationToken: cancellationToken);
                     }
                 }
-                foreach (var actor in Actors)
-                { 
-                   await _ActorsMovieRepository.AddAsync(new ActorsMovie
-                    {
-                        ActorId = actor,
-                        MovieId = movieid.Id,
-                    },cancellationToken);
-                await _ActorsMovieRepository.commitASync(cancellationToken: cancellationToken);
-                  }
-                
-                return RedirectToAction("Index");
+
+                TempData["success_notification"] = " movie Created Successfully";
+
+            }catch
+            {
+                TempData["error_notification"] = " movie Created Error";
             }
-            return View(movie);
+            return RedirectToAction("Index");
         }
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id ,CancellationToken cancellationToken)
         {
             //var movie = _context.Movies.Include(E=>E.ActorsMovies).FirstOrDefault(m => m.Id == id);
@@ -200,6 +217,7 @@ namespace Book_Movie_Tictet.Controllers
             });
         }
         [HttpPost]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(Movie movie, IFormFile MainImg, List<IFormFile>? SupImg,CancellationToken cancellationToken)
         {
             //var existingMovie = _context.Movies.AsNoTracking().FirstOrDefault(m => m.Id == movie.Id);
@@ -272,6 +290,7 @@ namespace Book_Movie_Tictet.Controllers
             }
             return View(movie);
         }
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Delete(int id ,CancellationToken cancellationToken)
         {
             var movie = await _movieIRepository.GetoneAsync(m => m.Id == id, includ:[m=>m.ActorsMovies,e=>e.Supimg] , cancellationToken:cancellationToken);

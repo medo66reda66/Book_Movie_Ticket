@@ -1,7 +1,9 @@
-﻿using Book_Movie_Ticket.Repository;
+﻿using Book_Movie_Ticket.data;
+using Book_Movie_Ticket.Repository;
 using Book_Movie_Ticket.Repository.IRepository;
+using Book_Movie_Ticket.Utilities;
 using Book_Movie_Tickets.Models;
-using Book_Movie_Tictet.data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 namespace Book_Movie_Tictet.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE},{SD.EMPLOYEE_ROLE}")]
     public class CinemaController : Controller
     {
         //private ApplicationDBContext _dbContext = new ApplicationDBContext();
@@ -62,6 +65,7 @@ namespace Book_Movie_Tictet.Controllers
             return View(cinema);
         }
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id , CancellationToken cancellationToken )
         {
             var cinema = await _db.GetoneAsync(e => e.Id == id,tracked:false, cancellationToken:cancellationToken);
@@ -105,6 +109,7 @@ namespace Book_Movie_Tictet.Controllers
             }
             return View(cinema);
         }
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Delete(int id,CancellationToken cancellationToken)
         {
             var cinema = await _db.GetoneAsync(e => e.Id == id,cancellationToken:cancellationToken);

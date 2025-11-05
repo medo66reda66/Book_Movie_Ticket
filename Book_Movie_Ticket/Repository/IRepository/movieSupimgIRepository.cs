@@ -1,5 +1,5 @@
 ﻿using Book_Movie_Ticket.Models;
-using Book_Movie_Tictet.data;
+using Book_Movie_Ticket.data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

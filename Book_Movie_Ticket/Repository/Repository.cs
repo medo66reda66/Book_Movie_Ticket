@@ -1,5 +1,5 @@
 ﻿using Book_Movie_Ticket.Repository.IRepository;
-using Book_Movie_Tictet.data;
+using Book_Movie_Ticket.data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -9,13 +9,16 @@ namespace Book_Movie_Ticket.Repository
     public class Repository<T> :IRepository<T>  where T : class
     {
 
-        private ApplicationDBContext _context = new ApplicationDBContext();
+        private ApplicationDBContext _context ;
         private DbSet<T> _db;
 
-        public Repository()
+        public Repository(ApplicationDBContext context)
         {
+            _context = context;
             _db = _context.Set<T>();
         }
+
+       
 
         public async Task<T> AddAsync(T entity ,CancellationToken cancellationToken)
         {

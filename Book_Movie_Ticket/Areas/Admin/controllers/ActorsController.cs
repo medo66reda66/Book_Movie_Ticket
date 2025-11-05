@@ -1,8 +1,10 @@
-﻿using Book_Movie_Ticket.Repository;
+﻿using Book_Movie_Ticket.data;
+using Book_Movie_Ticket.Repository;
 using Book_Movie_Ticket.Repository.IRepository;
+using Book_Movie_Ticket.Utilities;
 using Book_Movie_Tickets.Models;
-using Book_Movie_Tictet.data;
 using Book_Movie_Tictet.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 namespace Book_Movie_Tictet.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE},{SD.EMPLOYEE_ROLE}")]
     public class ActorsController : Controller
     {
 
@@ -53,6 +56,7 @@ namespace Book_Movie_Tictet.Controllers
             return View(actor);
         }
         [HttpGet]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(int id,CancellationToken cancellationToken)
         {
             var actor = await _db.GetoneAsync(e => e.Id == id,cancellationToken:cancellationToken);
@@ -63,6 +67,7 @@ namespace Book_Movie_Tictet.Controllers
             return View(actor);
         }
         [HttpPost]
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Edit(Actors actor, IFormFile? img,CancellationToken cancellationToken)
         {
             var existingActor = await _db.GetoneAsync(c => c.Id == actor.Id,tracked:false  ,cancellationToken:cancellationToken);
@@ -104,6 +109,7 @@ namespace Book_Movie_Tictet.Controllers
             }
             return View(actor);
         }
+        [Authorize(Roles = $"{SD.SUPER_ADMIN_ROLE},{SD.ADMIN_ROLE}")]
         public async Task<IActionResult> Delete(int id,CancellationToken cancellationToken)
         {
             var actor = await _db.GetoneAsync(e => e.Id == id,cancellationToken:cancellationToken);
