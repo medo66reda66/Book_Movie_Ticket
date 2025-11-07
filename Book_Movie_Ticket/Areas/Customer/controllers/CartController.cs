@@ -3,6 +3,7 @@ using Book_Movie_Ticket.Repository.IRepository;
 using Book_Movie_Tickets.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Stripe.Checkout;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -119,6 +120,49 @@ namespace Book_Movie_Ticket.Areas.Customer.controllers
             await _cartRepository.commitASync(cancellationToken);
             return RedirectToAction("Index");
 
+        }
+
+        public async Task<IActionResult> Pay()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user is null)
+                return NotFound();
+
+            var cart = await _cartRepository.GetAllAsync(e => e.ApplicationUserId == user.Id, includ: [e => e.Movie]);
+
+            if (cart is null) return NotFound();
+
+            var options = new SessionCreateOptions
+            {
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = new List<SessionLineItemOptions>(),
+                Mode = "payment",
+                SuccessUrl = $"{Request.Scheme}://{Request.Host}/customer/checkout/success",
+                CancelUrl = $"{Request.Scheme}://{Request.Host}/customer/checkout/cancel",
+            };
+
+            foreach (var item in cart)
+            {
+                options.LineItems.Add(new SessionLineItemOptions
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        Currency = "egp",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = item.Movie.Name,
+                            Description = item.Movie.Description,
+                        },
+                        UnitAmount = (long)item.Price * 100,
+                    },
+                    Quantity = item.count,
+                });
+            }
+
+            var service = new SessionService();
+            var session = service.Create(options);
+            return Redirect(session.Url);
         }
 
 

@@ -1,14 +1,16 @@
+using Book_Movie_Ticket.data;
 using Book_Movie_Ticket.Models;
 using Book_Movie_Ticket.Repository;
 using Book_Movie_Ticket.Repository.IRepository;
-using Book_Movie_Tickets.Models;
-using Book_Movie_Ticket.data;
-using Book_Movie_Tictet.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Book_Movie_Ticket.Utilities;
+using Book_Movie_Tickets.Models;
+using Book_Movie_Tictet.Models;
+using ECommerce.Utitlies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Stripe;
 
 namespace Book_Movie_Ticket
 {
@@ -42,6 +44,9 @@ namespace Book_Movie_Ticket
             })
             .AddEntityFrameworkStores<ApplicationDBContext>()
             .AddDefaultTokenProviders();
+
+            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
             builder.Services.AddTransient<IEmailSender, Emailsender>();
 
